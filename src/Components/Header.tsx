@@ -203,20 +203,17 @@ const Header: React.FC = () => {
               </div>
             </li>
             <li className="relative group">
-              <Link href="/contact" className="hover:text-red-600 flex items-center gap-1">
+              <Link href="/contact" className="hover:text-red-600 flex items-center gap-1 pr-9">
                 Contact Us
-                <FaAngleDown />
+                
               </Link>
-              <div className="absolute left-0 top-[40px] w-32 bg-white border rounded shadow-lg py-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <Link href="/contact/form" className="block px-4 py-2 hover:bg-gray-100">Contact Form</Link>
-                <Link href="/contact/locations" className="block px-4 py-2 hover:bg-gray-100">Our Locations</Link>
-              </div>
+              
             </li>
           </ul>
 
           {/* Icons (Search, Cart) */}
           <div className="flex items-center space-x-4 ">
-            <button className="text-xl text-black items-center gap-2 hover:text-red-600"><BsSearch /></button>
+            <button className="text-xl text-black items-center gap-4  hover:text-red-600"><BsSearch /></button>
             <Link href="/cart" className="relative text-2xl text-black flex items-center gap-2 hover:text-red-600">
               <LiaOpencart />
               <span className="absolute -top-1 -right-2 bg-red-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
