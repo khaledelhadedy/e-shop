@@ -1,9 +1,9 @@
 "use client";
 import Image from "next/image";
-import Header from "@/Components/Header";
-import Banner from "@/Components/Banner";
-import FeaturesSection from "@/Components/FeaturesSection"
-import ProductList from "@/Components/ProductList";
+import Header from "../Components/Header/Header"
+import Banner from "../Components/Banner/Banner";
+import FeaturesSection from "../Components/Section/FeaturesSection"
+import ProductList from "../Components/Products/ProductList";
 
 export default function Home() {
   return (

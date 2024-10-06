@@ -4,8 +4,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { AiFillStar, AiOutlineZoomIn, AiOutlineHeart } from 'react-icons/ai';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
-import { GoGitCompare } from 'react-icons/go'; // Compare icon
-import { LiaOpencart } from 'react-icons/lia'; // Add to Cart icon
+import { GoGitCompare } from 'react-icons/go';
+import { LiaOpencart } from 'react-icons/lia';
+import { useRouter } from 'next/navigation'; // Correct import for useRouter in Next.js
 
 interface Product {
   id: number;
@@ -22,9 +23,10 @@ const ProductList: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(0); // Index for card-by-card navigation
   const cardWidth = 260; // Card width in pixels
   const cardGap = 16; // Gap between cards
-  const totalCardWidth = cardWidth + cardGap; // Width of each card plus the gap
+  const totalCardWidth = cardWidth + cardGap; // Total width of each card plus the gap
 
   const productRowRef = useRef<HTMLDivElement>(null);
+  const router = useRouter(); // Initialize useRouter
 
   // Fetch products from the API
   useEffect(() => {
@@ -60,7 +62,7 @@ const ProductList: React.FC = () => {
     }
   };
 
-  // If loading, show a spinner or some loading text
+  // If loading, show a spinner or loading text
   if (loading) {
     return <div className="text-center py-10">Loading products...</div>;
   }
@@ -74,7 +76,7 @@ const ProductList: React.FC = () => {
         {/* Left Arrow */}
         <button
           onClick={prevCard}
-          className={`absolute left-0 z-10 p-2 transition-opacity duration-300 opacity-100`}
+          className="absolute left-0 z-10 p-2 transition-opacity duration-300 opacity-100"
         >
           <FaArrowLeft className="text-3xl text-black" />
         </button>
@@ -124,19 +126,29 @@ const ProductList: React.FC = () => {
 
                 {/* Product Info */}
                 <div className="flex flex-col flex-1 justify-between">
-                  <div className="text-center h-[60px]"> {/* Set height to align the text */}
-                    <h3 className="text-sm font-semibold text-gray-800 mb-1">{product.title}</h3>
-                    <p className="text-xs text-gray-500 mb-1">{product.category}</p>
+                  <div className="text-center h-[60px]">
+                    {/* Navigate to Single Product Page */}
+                    <h3
+                      className="text-sm font-semibold text-gray-800 mb-1 cursor-pointer hover:text-red-600 transition truncate ..."
+                      onClick={() => router.push(`/products/${product.id}`)} // Use router to navigate
+                    >
+                      {product.title}
+                    </h3>
+                    <p className="text-xs text-gray-500 mt-3 font-bold">{product.category}</p>
                   </div>
 
-                  <p className="text-xs text-gray-600 mb-2 text-center h-[40px]">{product.description.slice(0, 40)}...</p> {/* Set height to align description */}
+                  <p className="text-xs text-gray-600 mb-3 text-center h-[30px]">
+                    {product.description.slice(0, 40)}...
+                  </p>
 
-                  <div className="text-center mt-4">
+                  <div className="text-center mb-4">
                     {/* Price */}
-                    <div className="text-red-600 font-bold text-sm mb-2">${product.price.toFixed(2)}</div>
+                    <div className="text-red-600 font-bold text-sm mb-1">
+                      ${product.price.toFixed(2)}
+                    </div>
 
                     {/* Rating and Reviews */}
-                    <div className="flex justify-center items-center text-yellow-500 mb-2 space-x-1">
+                    <div className="flex justify-center items-center text-yellow-500 mb-9 space-x-1">
                       <AiFillStar className="text-xs" />
                       <AiFillStar className="text-xs" />
                       <AiFillStar className="text-xs" />
@@ -159,7 +171,7 @@ const ProductList: React.FC = () => {
         {/* Right Arrow */}
         <button
           onClick={nextCard}
-          className={`absolute right-0 z-10 p-2 transition-opacity duration-300 opacity-100`}
+          className="absolute right-0 z-10 p-2 transition-opacity duration-300 opacity-100"
         >
           <FaArrowRight className="text-3xl text-black" />
         </button>

@@ -1,35 +1,40 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { FaAngleDown, FaAngleUp } from 'react-icons/fa';
+import React, { useState, useEffect, useRef } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { FaAngleDown, FaAngleUp } from "react-icons/fa";
 import { CiPhone } from "react-icons/ci";
 import { GoGitCompare } from "react-icons/go";
 import { CiHeart } from "react-icons/ci";
 import { CgProfile } from "react-icons/cg";
 import { BsSearch } from "react-icons/bs";
 import { LiaOpencart } from "react-icons/lia";
+import { useRouter } from "next/navigation"; // Use for navigation control
+import { useUser } from "@/context/UserContext"; // Import user context for login/logout functionality
 
 const Header: React.FC = () => {
-  const [selectedLang, setSelectedLang] = useState('en'); // Default language is English
+  const [selectedLang, setSelectedLang] = useState("en"); // Default language is English
   const [isLangOpen, setIsLangOpen] = useState(false); // Control language dropdown visibility
   const langMenuRef = useRef<HTMLDivElement>(null); // Ref to handle outside click detection for language dropdown
 
-  const [selectedCurrency, setSelectedCurrency] = useState('USD'); // Default currency is USD
+  const [selectedCurrency, setSelectedCurrency] = useState("USD"); // Default currency is USD
   const [isCurrencyOpen, setIsCurrencyOpen] = useState(false); // Control currency dropdown visibility
   const currencyMenuRef = useRef<HTMLDivElement>(null); // Ref to handle outside click detection for currency dropdown
 
+  const { user, setUser } = useUser(); // Get user and setUser from UserContext
+  const router = useRouter(); // Initialize Next.js router
+
   const languages = [
-    { code: 'en', label: 'English', flag: '🇺🇸' }, 
-    { code: 'fr', label: 'French', flag: '🇫🇷' },  
-    { code: 'us', label: 'United States', flag: '🇺🇸' }, 
+    { code: "en", label: "English", flag: "🇺🇸" },
+    { code: "fr", label: "French", flag: "🇫🇷" },
+    { code: "us", label: "United States", flag: "🇺🇸" },
   ];
 
   const currencies = [
-    { code: 'USD', label: 'USD', symbol: '$' },
-    { code: 'EUR', label: 'Euro', symbol: '€' },
-    { code: 'GBP', label: 'Pound', symbol: '£' },
+    { code: "USD", label: "USD", symbol: "$" },
+    { code: "EUR", label: "Euro", symbol: "€" },
+    { code: "GBP", label: "Pound", symbol: "£" },
   ];
 
   // Close dropdowns if clicked outside
@@ -43,20 +48,26 @@ const Header: React.FC = () => {
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
   const handleLanguageChange = (langCode: string) => {
-    setSelectedLang(langCode); 
-    setIsLangOpen(false); 
+    setSelectedLang(langCode);
+    setIsLangOpen(false);
   };
 
   const handleCurrencyChange = (currencyCode: string) => {
-    setSelectedCurrency(currencyCode); 
-    setIsCurrencyOpen(false); 
+    setSelectedCurrency(currencyCode);
+    setIsCurrencyOpen(false);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    setUser(null);
+    router.push("/"); // Redirect to home after logout
   };
 
   return (
@@ -67,16 +78,13 @@ const Header: React.FC = () => {
           <div className="flex space-x-8 items-center">
             {/* Language Dropdown */}
             <div className="relative flex items-center" ref={langMenuRef}>
-              <button
-                className="flex items-center gap-2"
-                onClick={() => setIsLangOpen(!isLangOpen)}
-              >
-                <span>{languages.find(lang => lang.code === selectedLang)?.label}</span>
+              <button className="flex items-center gap-2" onClick={() => setIsLangOpen(!isLangOpen)}>
+                <span>{languages.find((lang) => lang.code === selectedLang)?.label}</span>
                 {isLangOpen ? <FaAngleUp /> : <FaAngleDown />}
               </button>
               {isLangOpen && (
                 <div className="absolute left-0 top-[40px] bg-white border rounded shadow-lg py-2 w-32">
-                  {languages.map(lang => (
+                  {languages.map((lang) => (
                     <button
                       key={lang.code}
                       onClick={() => handleLanguageChange(lang.code)}
@@ -92,16 +100,13 @@ const Header: React.FC = () => {
 
             {/* Currency Dropdown */}
             <div className="relative flex items-center" ref={currencyMenuRef}>
-              <button
-                className="flex items-center gap-2"
-                onClick={() => setIsCurrencyOpen(!isCurrencyOpen)}
-              >
-                <span>{currencies.find(currency => currency.code === selectedCurrency)?.label}</span>
+              <button className="flex items-center gap-2" onClick={() => setIsCurrencyOpen(!isCurrencyOpen)}>
+                <span>{currencies.find((currency) => currency.code === selectedCurrency)?.label}</span>
                 {isCurrencyOpen ? <FaAngleUp /> : <FaAngleDown />}
               </button>
               {isCurrencyOpen && (
                 <div className="absolute left-0 top-[40px] bg-white border rounded shadow-lg py-2 w-32">
-                  {currencies.map(currency => (
+                  {currencies.map((currency) => (
                     <button
                       key={currency.code}
                       onClick={() => handleCurrencyChange(currency.code)}
@@ -129,9 +134,15 @@ const Header: React.FC = () => {
             <Link className="flex items-center gap-2 hover:text-red-600" href="/wishlist">
               <CiHeart /> Wishlist
             </Link>
-            <Link className="flex items-center gap-2 hover:text-red-600" href="/login">
-              <CgProfile /> Login
-            </Link>
+            {user ? (
+              <button className="flex items-center gap-2 hover:text-red-600" onClick={handleLogout}>
+                <CgProfile /> Logout
+              </button>
+            ) : (
+              <Link className="flex items-center gap-2 hover:text-red-600" href="/login">
+                <CgProfile /> Login
+              </Link>
+            )}
           </div>
         </div>
       </div>
@@ -146,7 +157,7 @@ const Header: React.FC = () => {
               alt="Shopwise"
               width={150}
               height={50}
-              className="object-cover brightness-0" 
+              className="object-cover brightness-0"
             />
           </Link>
 
@@ -158,8 +169,12 @@ const Header: React.FC = () => {
                 <FaAngleDown />
               </Link>
               <div className="absolute left-0 top-[40px] w-32 bg-white border rounded shadow-lg py-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <Link href="/subpage1" className="block px-4 py-2 hover:bg-gray-100">Subpage 1</Link>
-                <Link href="/subpage2" className="block px-4 py-2 hover:bg-gray-100">Subpage 2</Link>
+                <Link href="/subpage1" className="block px-4 py-2 hover:bg-gray-100">
+                  Subpage 1
+                </Link>
+                <Link href="/subpage2" className="block px-4 py-2 hover:bg-gray-100">
+                  Subpage 2
+                </Link>
               </div>
             </li>
             <li className="relative group">
@@ -168,8 +183,12 @@ const Header: React.FC = () => {
                 <FaAngleDown />
               </Link>
               <div className="absolute left-0 top-[40px] w-32 bg-white border rounded shadow-lg py-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <Link href="/pages/about" className="block px-4 py-2 hover:bg-gray-100">About</Link>
-                <Link href="/pages/contact" className="block px-4 py-2 hover:bg-gray-100">Contact</Link>
+                <Link href="/pages/about" className="block px-4 py-2 hover:bg-gray-100">
+                  About
+                </Link>
+                <Link href="/pages/contact" className="block px-4 py-2 hover:bg-gray-100">
+                  Contact
+                </Link>
               </div>
             </li>
             <li className="relative group">
@@ -178,8 +197,12 @@ const Header: React.FC = () => {
                 <FaAngleDown />
               </Link>
               <div className="absolute left-0 top-[40px] w-32 bg-white border rounded shadow-lg py-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <Link href="/products/new" className="block px-4 py-2 hover:bg-gray-100">New Arrivals</Link>
-                <Link href="/products/best-sellers" className="block px-4 py-2 hover:bg-gray-100">Best Sellers</Link>
+                <Link href="/products/new" className="block px-4 py-2 hover:bg-gray-100">
+                  New Arrivals
+                </Link>
+                <Link href="/products/best-sellers" className="block px-4 py-2 hover:bg-gray-100">
+                  Best Sellers
+                </Link>
               </div>
             </li>
             <li className="relative group">
@@ -188,8 +211,12 @@ const Header: React.FC = () => {
                 <FaAngleDown />
               </Link>
               <div className="absolute left-0 top-[40px] w-32 bg-white border rounded shadow-lg py-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <Link href="/blog/articles" className="block px-4 py-2 hover:bg-gray-100">Articles</Link>
-                <Link href="/blog/news" className="block px-4 py-2 hover:bg-gray-100">News</Link>
+                <Link href="/blog/articles" className="block px-4 py-2 hover:bg-gray-100">
+                  Articles
+                </Link>
+                <Link href="/blog/news" className="block px-4 py-2 hover:bg-gray-100">
+                  News
+                </Link>
               </div>
             </li>
             <li className="relative group">
@@ -198,22 +225,26 @@ const Header: React.FC = () => {
                 <FaAngleDown />
               </Link>
               <div className="absolute left-0 top-[40px] w-32 bg-white border rounded shadow-lg py-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <Link href="/shop/mens" className="block px-4 py-2 hover:bg-gray-100">Men's</Link>
-                <Link href="/shop/womens" className="block px-4 py-2 hover:bg-gray-100">Women's</Link>
+                <Link href="/shop/mens" className="block px-4 py-2 hover:bg-gray-100">
+                  Men's
+                </Link>
+                <Link href="/shop/womens" className="block px-4 py-2 hover:bg-gray-100">
+                  Women's
+                </Link>
               </div>
             </li>
             <li className="relative group">
-              <Link href="/contact" className="hover:text-red-600 flex items-center gap-1 pr-9">
+              <Link href="/contact" className="hover:text-red-600 flex items-center gap-1">
                 Contact Us
-                
               </Link>
-              
             </li>
           </ul>
 
           {/* Icons (Search, Cart) */}
-          <div className="flex items-center space-x-4 ">
-            <button className="text-xl text-black items-center gap-4  hover:text-red-600"><BsSearch /></button>
+          <div className="flex items-center space-x-4">
+            <button className="text-xl text-black items-center gap-4  hover:text-red-600">
+              <BsSearch />
+            </button>
             <Link href="/cart" className="relative text-2xl text-black flex items-center gap-2 hover:text-red-600">
               <LiaOpencart />
               <span className="absolute -top-1 -right-2 bg-red-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
